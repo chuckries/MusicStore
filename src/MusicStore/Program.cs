@@ -15,6 +15,7 @@ namespace MusicStore
                 .UseStartup("MusicStore")
                 .Build();
 
+
             host.Run();
         }
     }

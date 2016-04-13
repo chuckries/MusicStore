@@ -1,0 +1,9 @@
+version: '2'
+
+services:
+  musicstore:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile.release
+    ports:
+      - "80:80"

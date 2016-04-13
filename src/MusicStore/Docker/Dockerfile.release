@@ -1,0 +1,18 @@
+FROM microsoft/aspnet:1.0.0-rc2
+
+# Restore the NuGets
+COPY project.json /app/
+WORKDIR /app
+RUN dotnet restore
+
+# Build the app
+COPY . /app
+RUN dotnet build -c Release
+
+# Configure the listening port to 80
+ENV ASPNET_SERVER.URLS http://*:80
+ENV ASPNETCORE_SERVER.URLS http://*:80
+EXPOSE 80
+
+# Start the app
+ENTRYPOINT /app/bin/Release/netstandardapp1.5/ubuntu.14.04-x64/app

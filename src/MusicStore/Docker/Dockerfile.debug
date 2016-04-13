@@ -1,0 +1,25 @@
+FROM microsoft/dotnet-preview:latest
+
+# Install debugging components
+ARG CLRDBG_VERSION=VS2015U2
+ADD https://raw.githubusercontent.com/Microsoft/MIEngine/getclrdbg-release/scripts/GetClrDbg.sh /clrdbg/
+WORKDIR /clrdbg
+RUN chmod 700 GetClrDbg.sh
+RUN ./GetClrDbg.sh $CLRDBG_VERSION
+
+# Restore the NuGets
+COPY NuGet.config /app/
+COPY global.json /app/
+COPY shared /app/shared
+COPY src/MusicStore /app/src/MusicStore
+WORKDIR /app/src/MusicStore
+RUN dotnet restore
+RUN dotnet build -c Debug
+
+# Configure the listening port to 80
+ENV ASPNET_SERVER.URLS http://*:80
+ENV ASPNETCORE_SERVER.URLS http://*:80
+EXPOSE 80
+
+# If we are launching through a remote debugger wait for it, otherwise start the app
+ENTRYPOINT ["/bin/bash", "-c", "if [ \"$REMOTE_DEBUGGING\" -eq 0 ]; then dotnet run ; else sleep infinity; fi"]
